@@ -22,7 +22,7 @@ final class PostalServiceProvider extends ServiceProvider
 
     private function bootProviders(): void
     {
-        //
+        $this->app->register(BladeServiceProvider::class);
     }
 
     private function bootMigrations(): void
