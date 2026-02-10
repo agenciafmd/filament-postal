@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Agenciafmd\Postal\Resources\Postal\Pages;
 
 use Agenciafmd\Admix\Resources\Concerns\RedirectBack;
@@ -9,7 +11,7 @@ use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
 use Filament\Resources\Pages\EditRecord;
 
-class EditPostal extends EditRecord
+final class EditPostal extends EditRecord
 {
     use RedirectBack;
 

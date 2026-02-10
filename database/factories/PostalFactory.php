@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Agenciafmd\Postal\Database\Factories;
 
 use Agenciafmd\Postal\Models\Postal;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class PostalFactory extends Factory
+final class PostalFactory extends Factory
 {
     protected $model = Postal::class;
 
@@ -21,10 +23,10 @@ class PostalFactory extends Factory
             'subject' => fake()->sentence(),
             'cc' => [
                 fake()->safeEmail(),
-                fake()->safeEmail()
+                fake()->safeEmail(),
             ],
             'bcc' => [
-                fake()->safeEmail()
+                fake()->safeEmail(),
             ],
             'slug' => str()->slug($name),
         ];

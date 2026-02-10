@@ -1,9 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Agenciafmd\Postal\Notifications;
 
-//use Agenciafmd\Leads\Channels\LeadChannel;
-//use Agenciafmd\Leads\Models\Lead;
+// use Agenciafmd\Leads\Channels\LeadChannel;
+// use Agenciafmd\Leads\Models\Lead;
 use Agenciafmd\Postal\Models\Postal;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -12,7 +14,7 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Symfony\Component\Mime\Email;
 
-class SendNotification extends Notification implements ShouldQueue
+final class SendNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -28,13 +30,13 @@ class SendNotification extends Notification implements ShouldQueue
     /* TODO: verificar se conseguimos criar um evento customizado a fim de disparar o leadChannel lá no pacote de leads */
     public function via(Postal $notifiable): array
     {
-//        $leadChannel = class_exists(LeadChannel::class) ? [
-//            LeadChannel::class,
-//        ] : [];
+        //        $leadChannel = class_exists(LeadChannel::class) ? [
+        //            LeadChannel::class,
+        //        ] : [];
 
         return [
             MailChannel::class,
-//            ...$leadChannel,
+            //            ...$leadChannel,
         ];
     }
 
@@ -105,15 +107,15 @@ class SendNotification extends Notification implements ShouldQueue
         return $mail;
     }
 
-//    public function toLead(array $data): void
-//    {
-//        Lead::query()
-//            ->create([
-//                'source' => $data['source'],
-//                'name' => $data['name'],
-//                'email' => $data['email'],
-//                'phone' => $data['phone'],
-//                'description' => $data['message'],
-//            ]);
-//    }
+    //    public function toLead(array $data): void
+    //    {
+    //        Lead::query()
+    //            ->create([
+    //                'source' => $data['source'],
+    //                'name' => $data['name'],
+    //                'email' => $data['email'],
+    //                'phone' => $data['phone'],
+    //                'description' => $data['message'],
+    //            ]);
+    //    }
 }
