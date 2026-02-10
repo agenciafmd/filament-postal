@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Agenciafmd\Postal\Notifications;
 
-// use Agenciafmd\Leads\Channels\LeadChannel;
-// use Agenciafmd\Leads\Models\Lead;
+use Agenciafmd\Postal\Channels\EventChannel;
+use Agenciafmd\Postal\Events\NotificationSent;
 use Agenciafmd\Postal\Models\Postal;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -27,16 +27,11 @@ final class SendNotification extends Notification implements ShouldQueue
         public ?string $subject = null,
     ) {}
 
-    /* TODO: verificar se conseguimos criar um evento customizado a fim de disparar o leadChannel lá no pacote de leads */
     public function via(Postal $notifiable): array
     {
-        //        $leadChannel = class_exists(LeadChannel::class) ? [
-        //            LeadChannel::class,
-        //        ] : [];
-
         return [
             MailChannel::class,
-            //            ...$leadChannel,
+            EventChannel::class,
         ];
     }
 
@@ -107,15 +102,8 @@ final class SendNotification extends Notification implements ShouldQueue
         return $mail;
     }
 
-    //    public function toLead(array $data): void
-    //    {
-    //        Lead::query()
-    //            ->create([
-    //                'source' => $data['source'],
-    //                'name' => $data['name'],
-    //                'email' => $data['email'],
-    //                'phone' => $data['phone'],
-    //                'description' => $data['message'],
-    //            ]);
-    //    }
+    public function toEvent(array $data): void
+    {
+        event(new NotificationSent($data));
+    }
 }
