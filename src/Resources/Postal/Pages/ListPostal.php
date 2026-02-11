@@ -8,7 +8,6 @@ use Agenciafmd\Admix\Resources\Concerns\RedirectBack;
 use Agenciafmd\Postal\Resources\Postal\PostalResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
-use Filament\Resources\Pages\PageRegistration;
 
 final class ListPostal extends ListRecords
 {
