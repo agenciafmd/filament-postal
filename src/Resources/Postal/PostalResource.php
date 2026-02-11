@@ -25,6 +25,8 @@ final class PostalResource extends Resource
 
     protected static ?string $model = Postal::class;
 
+    protected static ?int $navigationSort = 3;
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedEnvelope;
 
     protected static ?string $recordTitleAttribute = 'name';
