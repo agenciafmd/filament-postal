@@ -81,15 +81,29 @@ Exemplo simples de uso manual (fora da tabela), assumindo `$postal` é uma inst�
 use Agenciafmd\Postal\Models\Postal;
 use Agenciafmd\Postal\Notifications\SendNotification;
 
-$postal->notify(new SendNotification([
-    'greeting' => __('Hi :name!', ['name' => $postal->to_name]),
+$postal = Postal::query()
+    ->where('slug', 'contato')
+    ->first();
+
+if (!$postal) {
+    $this->dispatch(
+        event: 'swal',
+        level: 'error',
+        message: 'Formulário de disparo não configurado.',
+    );
+
+    return;
+}
+
+$postal->notify(new SendNotification(data: [
+    'greeting' => 'Contato',
     'introLines' => [
-        __('Form submission example.'),
-        '**' . ucfirst(__('Name')) . ":** {$postal->name}",
+        "**Nome:** {$data['name']}",
+        "**E-mail:** {$data['email']}",
+        "**Telefone:** {$data['phone']}",
     ],
-    'actionText' => __('Visit the website'),
-    'actionUrl' => config('app.url'),
-    'outroLines' => [ __('Thanks!') ],
+], from: [
+    $data['email'] => $data['name']
 ]));
 ```
 
