@@ -21,6 +21,15 @@ final class EditPostal extends EditRecord
         'auditRestored',
     ];
 
+    public function getRelationManagers(): array
+    {
+        if ($this->record->trashed()) {
+            return [];
+        }
+
+        return parent::getRelationManagers();
+    }
+
     public function auditRestored(): void
     {
         $this->fillForm();
