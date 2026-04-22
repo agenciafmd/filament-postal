@@ -13,14 +13,14 @@ final class PostalFactory extends Factory
 
     public function definition(): array
     {
-        $name = fake()->sentence(3);
+        $name = fake()->unique()->word();
 
         return [
             'is_active' => fake()->boolean(),
-            'name' => $name,
+            'name' => ucfirst($name),
             'to' => fake()->safeEmail(),
             'to_name' => fake()->name(),
-            'subject' => fake()->sentence(),
+            'subject' => ucfirst(fake()->words(nb: 2, asText: true)),
             'cc' => [
                 fake()->safeEmail(),
                 fake()->safeEmail(),
@@ -28,7 +28,7 @@ final class PostalFactory extends Factory
             'bcc' => [
                 fake()->safeEmail(),
             ],
-            'slug' => str()->slug($name),
+            'slug' => str($name)->slug(),
         ];
     }
 }
