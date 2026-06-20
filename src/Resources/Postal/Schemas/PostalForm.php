@@ -12,10 +12,7 @@ use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
-use Filament\Schemas\Components\Utilities\Get;
-use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
-use Filament\Support\Enums\Operation;
 
 final class PostalForm
 {
@@ -30,22 +27,7 @@ final class PostalForm
                                 ->schema([
                                     TextInput::make('name')
                                         ->translateLabel()
-                                        ->live(onBlur: true)
-                                        ->afterStateUpdated(function (Get $get, Set $set, ?string $old, ?string $state, string $operation) {
-                                            if ($operation === Operation::Edit->value) {
-                                                return;
-                                            }
-
-                                            if (($get('slug') ?? '') !== str($old)
-                                                ->slug()
-                                                ->toString()) {
-                                                return;
-                                            }
-
-                                            $set('slug', str($state)
-                                                ->slug()
-                                                ->toString());
-                                        })
+                                        ->generateSlug()
                                         ->autofocus()
                                         ->minLength(3)
                                         ->maxLength(255)
