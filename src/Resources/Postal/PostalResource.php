@@ -25,8 +25,6 @@ final class PostalResource extends Resource
 
     protected static ?string $model = Postal::class;
 
-    protected static ?int $navigationSort = 3;
-
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedEnvelope;
 
     protected static ?string $recordTitleAttribute = 'name';
@@ -39,6 +37,16 @@ final class PostalResource extends Resource
     public static function getPluralModelLabel(): string
     {
         return __('Forms');
+    }
+
+    public static function getNavigationSort(): ?int
+    {
+        return config('filament-postal.navigation_sort');
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return config('filament-postal.navigation_group');
     }
 
     public static function form(Schema $schema): Schema
