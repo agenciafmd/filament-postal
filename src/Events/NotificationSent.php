@@ -10,12 +10,9 @@ use Illuminate\Queue\SerializesModels;
 
 final class NotificationSent
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels;
+    use Dispatchable;
+    use InteractsWithSockets;
+    use SerializesModels;
 
-    public array $data;
-
-    public function __construct($data)
-    {
-        $this->data = $data;
-    }
+    public function __construct(public array $data) {}
 }

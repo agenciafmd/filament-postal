@@ -58,7 +58,7 @@ final class PostalTable
                     ->translateLabel()
                     ->icon(Heroicon::PaperAirplane)
                     ->link()
-                    ->action(function (Postal $record) {
+                    ->action(function (Postal $record): void {
                         try {
                             $record->notify(new SendNotification([
                                 'greeting' => __('Hi :name!', ['name' => $record->to_name]),
@@ -98,9 +98,6 @@ final class PostalTable
                     RestoreBulkAction::make(),
                 ]),
             ])
-            ->defaultSort(function (Builder $query): Builder {
-                return $query->orderBy('is_active', 'desc')
-                    ->orderBy('name');
-            });
+            ->defaultSort(fn (Builder $query): Builder => $query->sort());
     }
 }

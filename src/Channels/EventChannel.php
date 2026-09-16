@@ -15,11 +15,11 @@ final class EventChannel
         $data['source'] = $notifiable->slug;
 
         $data = $lines
-            ->map(fn ($line) => mb_trim($line))
-            ->map(fn ($line) => str_replace('*', '', $line))
-            ->filter(fn ($line) => str_contains($line, ':'))
-            ->map(fn ($line) => explode(':', $line, 2))
-            ->mapWithKeys(function ($line) {
+            ->map(fn ($line): string => mb_trim($line))
+            ->map(fn ($line): string => str_replace('*', '', $line))
+            ->filter(fn ($line): bool => str_contains($line, ':'))
+            ->map(fn ($line): array => explode(':', $line, 2))
+            ->mapWithKeys(function ($line): array {
                 $key = str($line[0])
                     ->slug()
                     ->toString();

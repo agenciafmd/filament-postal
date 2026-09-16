@@ -12,7 +12,7 @@ final class PostalService
 {
     public static function make(): static
     {
-        return app(self::class);
+        return resolve(self::class);
     }
 
     public function emails(): Collection

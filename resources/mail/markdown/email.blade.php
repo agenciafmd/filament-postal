@@ -1,7 +1,7 @@
 @component('filament-postal::markdown.message')
 <?php
-    $level = ($level) ?? 'default';
-    $introLines = ($introLines) ?? [];
+    $level ??= 'default';
+    $introLines ??= [];
 
     switch ($level) {
         case 'success':

@@ -12,13 +12,13 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Channels\MailChannel;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Queue\Attributes\Tries;
 use Symfony\Component\Mime\Email;
 
+#[Tries(3)]
 final class SendNotification extends Notification implements ShouldQueue
 {
     use Queueable;
-
-    public int $tries = 3;
 
     public function __construct(
         public array $data = [],
@@ -92,7 +92,7 @@ final class SendNotification extends Notification implements ShouldQueue
             $mail->attach($attach);
         }
 
-        $mail->withSymfonyMessage(static function (Email $message) {
+        $mail->withSymfonyMessage(static function (Email $message): void {
             $message->getHeaders()
                 ->addTextHeader(
                     'X-Mailgun-Tag', config('app.name')

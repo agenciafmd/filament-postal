@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Agenciafmd\Postal\Models;
 
+use Agenciafmd\Admix\Traits\WithScopes;
 use Agenciafmd\Postal\Database\Factories\PostalFactory;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -17,11 +19,20 @@ use OwenIt\Auditing\Auditable;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 
 #[UseFactory(PostalFactory::class)]
+#[Table(name: 'postal')]
 final class Postal extends Model implements AuditableContract
 {
-    use Auditable, HasFactory, Notifiable, Prunable, SoftDeletes;
+    use Auditable;
+    use HasFactory;
+    use Notifiable;
+    use Prunable;
+    use SoftDeletes;
+    use WithScopes;
 
-    protected $table = 'postal';
+    protected array $defaultSort = [
+        'is_active' => 'desc',
+        'name' => 'asc',
+    ];
 
     public function prunable(): Builder
     {
@@ -29,7 +40,7 @@ final class Postal extends Model implements AuditableContract
             ->where('deleted_at', '<=', now()->subDays(30));
     }
 
-    public function routeNotificationForMail(Notification $notification): array|string
+    public function routeNotificationForMail(Notification $notification): array
     {
         return [
             $this->to => $this->to_name,

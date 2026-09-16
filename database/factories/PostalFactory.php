@@ -7,6 +7,9 @@ namespace Agenciafmd\Postal\Database\Factories;
 use Agenciafmd\Postal\Models\Postal;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/**
+ * @extends Factory<Postal>
+ */
 final class PostalFactory extends Factory
 {
     protected $model = Postal::class;
