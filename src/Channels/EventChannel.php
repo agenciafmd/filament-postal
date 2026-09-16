@@ -4,22 +4,19 @@ declare(strict_types=1);
 
 namespace Agenciafmd\Postal\Channels;
 
-use Illuminate\Notifications\Notification;
+use Agenciafmd\Postal\Models\Postal;
+use Agenciafmd\Postal\Notifications\SendNotification;
 
 final class EventChannel
 {
-    public function send(mixed $notifiable, Notification $notification): void
+    public function send(Postal $notifiable, SendNotification $notification): void
     {
-        $lines = collect($notification->data['introLines']);
-
-        $data['source'] = $notifiable->slug;
-
-        $data = $lines
-            ->map(fn ($line): string => mb_trim($line))
-            ->map(fn ($line): string => str_replace('*', '', $line))
-            ->filter(fn ($line): bool => str_contains($line, ':'))
-            ->map(fn ($line): array => explode(':', $line, 2))
-            ->mapWithKeys(function ($line): array {
+        $data = collect($notification->data['introLines'] ?? [])
+            ->map(fn (string $line): string => mb_trim($line))
+            ->map(fn (string $line): string => str_replace('*', '', $line))
+            ->filter(fn (string $line): bool => str_contains($line, ':'))
+            ->map(fn (string $line): array => explode(':', $line, 2))
+            ->mapWithKeys(function (array $line): array {
                 $key = str($line[0])
                     ->slug()
                     ->toString();
@@ -30,8 +27,8 @@ final class EventChannel
                 ];
             })
             ->filter()
-            ->merge($data)
-            ->toArray();
+            ->put('source', $notifiable->slug)
+            ->all();
 
         $notification->toEvent($data);
     }

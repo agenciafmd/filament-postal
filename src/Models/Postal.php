@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Prunable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Notifications\Notification;
+use Override;
 use OwenIt\Auditing\Auditable;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 
@@ -47,6 +48,7 @@ final class Postal extends Model implements AuditableContract
         ];
     }
 
+    #[Override]
     protected function casts(): array
     {
         return [

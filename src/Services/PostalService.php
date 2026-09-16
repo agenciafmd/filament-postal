@@ -24,7 +24,7 @@ final class PostalService
                 'bcc',
             ])
             ->get()
-            ->map(fn ($item) => collect($item)->flatten())
+            ->map(fn (Postal $item): Collection => collect($item)->flatten())
             ->flatten()
             ->unique()
             ->sort()
