@@ -12,9 +12,11 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Channels\MailChannel;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Queue\Attributes\Backoff;
 use Illuminate\Queue\Attributes\Tries;
 use Symfony\Component\Mime\Email;
 
+#[Backoff(60)]
 #[Tries(3)]
 final class SendNotification extends Notification implements ShouldQueue
 {
