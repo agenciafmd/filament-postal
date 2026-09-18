@@ -16,8 +16,8 @@ use Illuminate\Queue\Attributes\Backoff;
 use Illuminate\Queue\Attributes\Tries;
 use Symfony\Component\Mime\Email;
 
-#[Backoff(60)]
-#[Tries(3)]
+#[Backoff([10, 30, 60])]
+#[Tries(4)]
 final class SendNotification extends Notification implements ShouldQueue
 {
     use Queueable;
