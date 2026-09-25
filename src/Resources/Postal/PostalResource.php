@@ -39,6 +39,16 @@ final class PostalResource extends Resource
         return __('Forms');
     }
 
+    /**
+     * @return array<string, string>
+     */
+    public static function getExtraPermissions(): array
+    {
+        return [
+            'send' => __('send'),
+        ];
+    }
+
     public static function getNavigationSort(): ?int
     {
         return config('filament-postal.navigation_sort');

@@ -56,6 +56,7 @@ final class PostalTable
             ->recordActions([
                 Action::make('send')
                     ->translateLabel()
+                    ->authorize('send')
                     ->icon(Heroicon::PaperAirplane)
                     ->link()
                     ->action(function (Postal $record): void {
