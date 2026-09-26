@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Agenciafmd\Postal\Database\Seeders;
 
+use Agenciafmd\Postal\Database\Factories\PostalFactory;
 use Agenciafmd\Postal\Models\Postal;
 use Illuminate\Database\Seeder;
 
@@ -14,7 +15,7 @@ final class PostalSeeder extends Seeder
         Postal::query()
             ->truncate();
 
-        Postal::factory()
+        PostalFactory::new()
             ->count(10)
             ->create();
     }

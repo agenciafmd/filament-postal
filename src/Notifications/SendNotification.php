@@ -22,6 +22,11 @@ final class SendNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
+    /**
+     * @param  array{greeting?: string|null, introLines?: array<int, string>, actionText?: string|null, actionUrl?: string|null, outroLines?: array<int, string>}  $data
+     * @param  array<string, string>  $from  e-mail => nome, usado no reply-to
+     * @param  array<int, string>  $attach  caminhos dos arquivos anexados
+     */
     public function __construct(
         public array $data = [],
         public array $from = [],
@@ -29,6 +34,9 @@ final class SendNotification extends Notification implements ShouldQueue
         public ?string $subject = null,
     ) {}
 
+    /**
+     * @return array<int, class-string>
+     */
     public function via(Postal $notifiable): array
     {
         return [
@@ -40,9 +48,9 @@ final class SendNotification extends Notification implements ShouldQueue
     public function toMail(Postal $notifiable): MailMessage
     {
         $content = array_merge([
-            'greeting' => __('Hi :name!', ['name' => $notifiable->to_name]),
+            'greeting' => $this->translate('Hi :name!', ['name' => $notifiable->to_name]),
             'introLines' => [
-                __('This email sent by the website through the :name form.', ['name' => $notifiable->name]),
+                $this->translate('This email sent by the website through the :name form.', ['name' => $notifiable->name]),
             ],
             'actionText' => null,
             'actionUrl' => null,
@@ -55,7 +63,7 @@ final class SendNotification extends Notification implements ShouldQueue
             ->markdown('filament-postal::markdown.email')
             ->theme('filament-postal::theme.tabler')
             ->level('default')
-            ->subject(($this->subject) ?? config('app.name') . ' | ' . $notifiable->subject);
+            ->subject($this->subject ?? config()->string('app.name') . ' | ' . $notifiable->subject);
 
         if ($content['greeting']) {
             $mail->greeting($content['greeting']);
@@ -77,17 +85,13 @@ final class SendNotification extends Notification implements ShouldQueue
             $mail->replyTo(key($this->from), current($this->from));
         }
 
-        if ($ccs = $notifiable->cc) {
-            foreach ($ccs as $cc) {
-                $mail->cc($cc);
-            }
-        }
+        collect($notifiable->cc ?? [])
+            ->filter(static fn (mixed $cc): bool => is_string($cc))
+            ->each(static fn (string $cc): MailMessage => $mail->cc($cc));
 
-        if ($bccs = $notifiable->bcc) {
-            foreach ($bccs as $bcc) {
-                $mail->bcc($bcc);
-            }
-        }
+        collect($notifiable->bcc ?? [])
+            ->filter(static fn (mixed $bcc): bool => is_string($bcc))
+            ->each(static fn (string $bcc): MailMessage => $mail->bcc($bcc));
 
         /* TODO: modificar para o attachFromStorage quando subir a versão do laravel */
         foreach ($this->attach as $attach) {
@@ -97,15 +101,28 @@ final class SendNotification extends Notification implements ShouldQueue
         $mail->withSymfonyMessage(static function (Email $message): void {
             $message->getHeaders()
                 ->addTextHeader(
-                    'X-Mailgun-Tag', config('app.name')
+                    'X-Mailgun-Tag', config()->string('app.name')
                 );
         });
 
         return $mail;
     }
 
+    /**
+     * @param  array<string, string>  $data
+     */
     public function toEvent(array $data): void
     {
         event(new NotificationSent($data));
+    }
+
+    /**
+     * @param  array<string, string|null>  $replace
+     */
+    private function translate(string $key, array $replace = []): string
+    {
+        $translation = __($key, $replace);
+
+        return is_string($translation) ? $translation : $key;
     }
 }

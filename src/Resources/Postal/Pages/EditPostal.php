@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Agenciafmd\Postal\Resources\Postal\Pages;
 
 use Agenciafmd\Admix\Resources\Concerns\RedirectBack;
+use Agenciafmd\Postal\Models\Postal;
 use Agenciafmd\Postal\Resources\Postal\PostalResource;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ForceDeleteAction;
@@ -17,13 +18,18 @@ final class EditPostal extends EditRecord
 
     protected static string $resource = PostalResource::class;
 
+    /**
+     * @var array<int, string>
+     */
     protected $listeners = [
         'auditRestored',
     ];
 
     public function getRelationManagers(): array
     {
-        if ($this->record->trashed()) {
+        $record = $this->getRecord();
+
+        if ($record instanceof Postal && $record->trashed()) {
             return [];
         }
 

@@ -27,7 +27,9 @@ final class EventChannel
                 ];
             })
             ->filter()
-            ->put('source', $notifiable->slug)
+            ->merge([
+                'source' => $notifiable->slug,
+            ])
             ->all();
 
         $notification->toEvent($data);

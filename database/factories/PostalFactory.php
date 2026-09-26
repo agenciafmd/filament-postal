@@ -23,7 +23,7 @@ final class PostalFactory extends Factory
             'name' => ucfirst($name),
             'to' => fake()->safeEmail(),
             'to_name' => fake()->name(),
-            'subject' => ucfirst(fake()->words(nb: 2, asText: true)),
+            'subject' => ucfirst(fake()->word() . ' ' . fake()->word()),
             'cc' => [
                 fake()->safeEmail(),
                 fake()->safeEmail(),

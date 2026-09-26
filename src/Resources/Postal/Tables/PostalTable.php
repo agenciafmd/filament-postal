@@ -68,11 +68,11 @@ final class PostalTable
                                     '**' . ucfirst(__('Name')) . ":** {$record->name}",
                                     '**' . ucfirst(__('Subject')) . ":** {$record->subject}",
                                     '**' . ucfirst(__('To name')) . ":** {$record->to_name} ({$record->to})",
-                                    '**' . ucfirst(__('Cc')) . ':** ' . (count($record->cc) ? implode(', ', $record->cc) : 'Nenhuma'),
-                                    '**' . ucfirst(__('Bcc')) . ':** ' . (count($record->bcc) ? implode(', ', $record->bcc) : 'Nenhuma'),
+                                    '**' . ucfirst(__('Cc')) . ':** ' . self::emails($record->cc),
+                                    '**' . ucfirst(__('Bcc')) . ':** ' . self::emails($record->bcc),
                                 ],
                                 'actionText' => __('Visit the website'),
-                                'actionUrl' => config('app.url'),
+                                'actionUrl' => config()->string('app.url'),
                                 'outroLines' => [
                                     __('These are the lines below the button.'),
                                 ],
@@ -100,5 +100,17 @@ final class PostalTable
                 ]),
             ])
             ->defaultSort(fn (Builder $query): Builder => $query->sort());
+    }
+
+    /**
+     * @param  array<array-key, mixed>|null  $emails
+     */
+    private static function emails(?array $emails): string
+    {
+        $list = collect($emails ?? [])
+            ->filter(static fn (mixed $email): bool => is_string($email))
+            ->implode(', ');
+
+        return $list !== '' ? $list : 'Nenhuma';
     }
 }

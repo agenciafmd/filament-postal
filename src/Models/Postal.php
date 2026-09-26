@@ -24,23 +24,35 @@ use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 final class Postal extends Model implements AuditableContract
 {
     use Auditable;
+
+    /** @use HasFactory<PostalFactory> */
     use HasFactory;
+
     use Notifiable;
     use Prunable;
     use SoftDeletes;
     use WithScopes;
 
+    /**
+     * @var array<string, 'asc'|'desc'>
+     */
     protected array $defaultSort = [
         'is_active' => 'desc',
         'name' => 'asc',
     ];
 
+    /**
+     * @return Builder<self>
+     */
     public function prunable(): Builder
     {
         return self::query()
             ->where('deleted_at', '<=', today()->subDays(30));
     }
 
+    /**
+     * @return array<string, string|null>
+     */
     public function routeNotificationForMail(Notification $notification): array
     {
         return [

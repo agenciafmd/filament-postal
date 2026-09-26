@@ -14,5 +14,8 @@ final class NotificationSent
     use InteractsWithSockets;
     use SerializesModels;
 
+    /**
+     * @param  array<string, string>  $data  campos extraídos das linhas do e-mail, mais o `source`
+     */
     public function __construct(public array $data) {}
 }

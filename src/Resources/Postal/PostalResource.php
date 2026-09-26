@@ -51,12 +51,16 @@ final class PostalResource extends Resource
 
     public static function getNavigationSort(): ?int
     {
-        return config('filament-postal.navigation_sort');
+        $navigationSort = config('filament-postal.navigation_sort');
+
+        return is_int($navigationSort) ? $navigationSort : null;
     }
 
     public static function getNavigationGroup(): ?string
     {
-        return config('filament-postal.navigation_group');
+        $navigationGroup = config('filament-postal.navigation_group');
+
+        return is_string($navigationGroup) ? $navigationGroup : null;
     }
 
     public static function form(Schema $schema): Schema

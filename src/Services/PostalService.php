@@ -15,6 +15,11 @@ final class PostalService
         return resolve(self::class);
     }
 
+    /**
+     * Todos os e-mails de destino, cópia e cópia oculta, sem repetição.
+     *
+     * @return Collection<int, string>
+     */
     public function emails(): Collection
     {
         return $this->queryBuilder()
@@ -24,13 +29,20 @@ final class PostalService
                 'bcc',
             ])
             ->get()
-            ->map(fn (Postal $item): Collection => collect($item)->flatten())
-            ->flatten()
+            ->flatMap(static fn (Postal $postal): array => [
+                $postal->to,
+                ...$postal->cc ?? [],
+                ...$postal->bcc ?? [],
+            ])
+            ->filter(static fn (mixed $email): bool => is_string($email))
             ->unique()
             ->sort()
             ->values();
     }
 
+    /**
+     * @return Builder<Postal>
+     */
     private function queryBuilder(): Builder
     {
         return Postal::query();
