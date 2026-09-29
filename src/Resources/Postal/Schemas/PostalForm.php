@@ -59,7 +59,7 @@ final class PostalForm
                                         ])
                                         ->suggestions(fn (): array => PostalService::make()
                                             ->emails()
-                                            ->toArray())
+                                            ->all())
                                         ->columnSpanFull(),
                                     TagsInput::make('bcc')
                                         ->translateLabel()
@@ -69,7 +69,7 @@ final class PostalForm
                                         ])
                                         ->suggestions(fn (): array => PostalService::make()
                                             ->emails()
-                                            ->toArray())
+                                            ->all())
                                         ->columnSpanFull(),
                                 ])
                                 ->collapsible()
