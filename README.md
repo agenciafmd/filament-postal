@@ -1,12 +1,15 @@
-# Agenciafmd – Filament Postal
+# Filament – Postal
 
-Pacote de formulários e envios de e-mail (Postal) para o painel administrativo (Admix), baseado em Filament v4 e Laravel 12. Ele fornece o CRUD completo de modelos de e-mail (destinatários, assunto, cópias), incluindo auditoria, filtros, envio de teste direto da tabela, e infraestrutura de notificação com canal de evento para integrações.
+[![Downloads](https://img.shields.io/packagist/dt/agenciafmd/filament-postal.svg?style=flat-square)](https://packagist.org/packages/agenciafmd/filament-postal)
+[![Licença](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
+
+Adiciona ao Admix o cadastro dos formulários do site (destinatário, assunto, cópias) e a notificação pronta para disparar os e-mails desses formulários, com envio de teste direto da listagem e evento para integrações (ex.: `agenciafmd/filament-leads`).
 
 ## Requisitos
 
 - PHP ^8.4
-- Laravel ^12.0
-- Filament ^4.0
+- Laravel ^12.0 | ^13.0
+- Filament ^5.0
 - agenciafmd/filament-admix v1.x-dev | dev-master
 
 ## Instalação
@@ -23,15 +26,27 @@ composer require agenciafmd/filament-postal
 php artisan migrate
 ```
 
-3. (Opcional) Popule o banco:
+3. Populando o banco com dados de testes
 
-```bash
-php artisan db:seed --class=Agenciafmd\\Postal\\Database\\Seeders\\PostalSeeder
+Adicione o seeder no `database/seeders/DatabaseSeeder.php`:
+
+```php
+use Agenciafmd\Postal\Database\Seeders\PostalSeeder;
+
+$this->call([
+    PostalSeeder::class,
+]);
 ```
 
-## Ativando no painel Filament
+Ou rode o seeder manualmente:
 
-Este pacote inclui um Plugin Filament que registra o `PostalResource` automaticamente. Adicione o plugin na config do admix `config/filament-admix.php`:
+```bash
+php artisan db:seed --class="Agenciafmd\Postal\Database\Seeders\PostalSeeder"
+```
+
+## Ativando no painel
+
+Adicione o plugin na config do admix `config/filament-admix.php`:
 
 ```php
 use Agenciafmd\Postal\PostalPlugin;
@@ -43,39 +58,33 @@ return [
 ];
 ```
 
-Após isso, o menu "Formulários" aparecerá no painel, com as páginas de Listar, Criar e Editar.
+Após isso, o menu **Formulários** aparecerá no painel, com as páginas de Listar, Criar e Editar. Cada registro da listagem tem a ação **Enviar**, que dispara um e-mail de teste para o destinatário e as cópias configuradas.
 
-## Recursos incluídos
+## Configuração
 
-- Model: `Agenciafmd\Postal\Models\Postal` (Soft Deletes, HasFactory, Notifiable, Auditing e limpeza programada via `prunable()`)
-- Migração: cria a tabela `postal` com campos principais (`name`, `slug` único, `to`, `to_name`, `subject`, `cc` e `bcc` em array, flag `is_active`, timestamps e soft deletes)
-- Factory e Seeder: `PostalFactory` e `PostalSeeder`
-- Resource Filament: `PostalResource` com páginas `ListPostal`, `CreatePostal`, `EditPostal`
-- Formulário: `PostalForm` com seções "General" e "Information"
-- Tabela: `PostalTable` com colunas, filtros, ação de envio de teste e ordenação padrão
-- Serviço: `PostalService` (sugestões de e-mails únicas para `cc`/`bcc`)
-- Traduções pt_BR prontas
-- Views Blade para e-mail com tema/layout próprios e ícones (publicáveis)
+Arquivo: `config/filament-postal.php`
 
-## Notificações, Canais e Eventos
+```php
+return [
+    'name' => 'Postal',
+    'navigation_group' => null,
+    'navigation_sort' => 3,
+];
+```
 
-O pacote provê um fluxo de notificação pronto para integrar com filas e eventos:
+| Chave              | Padrão   | Descrição                                                     |
+|--------------------|----------|---------------------------------------------------------------|
+| `name`             | `Postal` | Nome do pacote.                                               |
+| `navigation_group` | `null`   | Grupo do menu em que o Resource aparece (`null` = sem grupo). |
+| `navigation_sort`  | `3`      | Posição do item no menu.                                      |
 
-- `Agenciafmd\Postal\Notifications\SendNotification` (implements `ShouldQueue`):
-  - Canais: `MailChannel` e `EventChannel` (custom do pacote)
-  - Markdown do e-mail: `filament-postal::markdown.email`
-  - Tema: `filament-postal::theme.tabler`
-  - Respeita `cc`/`bcc` definidos no registro Postal e permite `replyTo` via `from` no construtor
-  - Aceita `attach` (lista de paths de arquivos) – ver comentário no código para futura troca por `attachFromStorage`
+Formulários na lixeira há mais de 30 dias são removidos pelo `model:prune`, agendado diariamente às 03h (minuto definido em `filament-admix.schedule.minutes`).
 
-- `Agenciafmd\Postal\Channels\EventChannel`:
-  - Extrai pares `chave: valor` das linhas de `introLines` do conteúdo do e-mail
-  - Normaliza chaves (`slug`) e emite um evento com os dados do formulário e `source` apontando para o `slug` do registro
+## Uso
 
-- `Agenciafmd\Postal\Events\NotificationSent`:
-  - Evento simples contendo o array de dados processado pelo canal
+### Enviando um formulário
 
-Exemplo simples de uso manual (fora da tabela), assumindo `$postal` é uma instância de `Postal`:
+Cada registro do Postal (`Agenciafmd\Postal\Models\Postal`) é notificável: o e-mail vai para `to`/`to_name`, com as cópias de `cc` e `bcc`. Busque o registro pelo `slug` (campo "Identificador") e notifique com `Agenciafmd\Postal\Notifications\SendNotification`. Exemplo em um componente Livewire, com os dados do formulário em `$data`:
 
 ```php
 use Agenciafmd\Postal\Models\Postal;
@@ -107,37 +116,76 @@ $postal->notify(new SendNotification(data: [
 ]));
 ```
 
-## Views e Assets publicáveis
+Parâmetros do `SendNotification`:
 
-As views de e-mail e os ícones utilizados no template podem ser publicados:
+| Parâmetro | Descrição                                                                                                                                             |
+|-----------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `data`    | Conteúdo do e-mail: `greeting`, `introLines`, `actionText`, `actionUrl` e `outroLines`. Sem `greeting`/`introLines`, usa a saudação e o texto padrão. |
+| `from`    | `['e-mail' => 'nome']` usado como `replyTo`.                                                                                                          |
+| `attach`  | Lista de caminhos de arquivos anexados ao e-mail.                                                                                                     |
+| `subject` | Assunto do e-mail. Quando omitido, usa `{APP_NAME} \| {assunto do registro}`.                                                                          |
+
+A notificação implementa `ShouldQueue` (4 tentativas, backoff de 10, 30 e 60 segundos), usa o markdown `filament-postal::markdown.email` com o tema `filament-postal::theme.tabler` e adiciona o header `X-Mailgun-Tag` com o `APP_NAME`.
+
+### Evento `NotificationSent`
+
+Além do e-mail, a notificação passa pelo canal `Agenciafmd\Postal\Channels\EventChannel`, que:
+
+- lê as linhas de `introLines` no formato `chave: valor` (removendo os `*` do markdown);
+- normaliza as chaves com `slug` e descarta valores vazios;
+- adiciona `source` com o `slug` do registro do Postal;
+- dispara `Agenciafmd\Postal\Events\NotificationSent`, com esses dados na propriedade `$data`.
+
+No exemplo acima, o evento recebe `['nome' => ..., 'e-mail' => ..., 'telefone' => ..., 'source' => 'contato']`. O `agenciafmd/filament-leads` escuta esse evento para criar leads; para outras integrações, registre um listener:
+
+```php
+use Agenciafmd\Postal\Events\NotificationSent;
+use Illuminate\Support\Facades\Event;
+
+Event::listen(NotificationSent::class, function (NotificationSent $event): void {
+    // $event->data
+});
+```
+
+## Permissões
+
+O `PostalResource` entra automaticamente no controle de permissões por Grupos do Admix. Usuários sem grupo são administradores e têm acesso total.
+
+Permissões extras (`getExtraPermissions()`):
+
+| Permissão | Descrição                                          |
+|-----------|----------------------------------------------------|
+| `send`    | Libera a ação **Enviar** (e-mail de teste) na listagem. |
+
+## Auditoria
+
+O `PostalResource` inclui o relation manager `Tapp\FilamentAuditing\RelationManagers\AuditsRelationManager`, exibindo o histórico de auditorias do registro.
+
+## Publicação de assets
+
+As views de e-mail e os ícones usados no template podem ser publicados:
 
 ```bash
 php artisan vendor:publish --tag=filament-postal:mail --no-interaction
 php artisan vendor:publish --tag=filament-postal:images --no-interaction
 ```
 
-- Views de e-mail: `resources/views/vendor/agenciafmd/filament-postal/mail` (inclui `layout`, `markdown/message`, `markdown/email`, componentes como `icon`, `header`, `footer`, etc.)
-- Imagens: `public/vendor/agenciafmd/filament-postal/images/{color}/{icon}.png`
+- `filament-postal:mail`: views de e-mail em `resources/views/vendor/agenciafmd/filament-postal/mail` (`layout`, `markdown/message`, `markdown/email`, `theme/tabler.css` e componentes como `icon`, `header`, `footer`, `button`, `greeting` e `subcopy`).
+- `filament-postal:images`: ícones em `public/vendor/agenciafmd/filament-postal/images/icons/{cor}/{icone}.png` (cores `blue`, `gray`, `green`, `red` e `yellow`).
 
 ## Atualização
 
-Para manter os assets atualizados, adicione o comando `@php artisan vendor:publish --tag=filament-postal:images --ansi --force` ao seu `post-update-cmd` no `composer.json` do seu projeto.
+Para manter os ícones atualizados, adicione o comando abaixo ao `post-update-cmd` do `composer.json` do projeto:
 
-## Configuração
-
-Arquivo: `config/filament-postal.php`
-
-```php
-return [
-    'name' => 'Postal',
-];
+```json
+{
+    "scripts": {
+        "post-update-cmd": [
+            "@php artisan vendor:publish --tag=filament-postal:images --ansi --force"
+        ]
+    }
+}
 ```
-
-Atualmente, a configuração define apenas o nome exibido em traduções/labels. Ajustes adicionais podem ser introduzidos conforme evolução do pacote.
-
-## Auditoria
-
-O `PostalResource` inclui o relation manager `Tapp\FilamentAuditing\RelationManagers\AuditsRelationManager`, exibindo o histórico de auditorias quando o pacote `tapp/filament-auditing` for utilizado pelo projeto via `filament-admix`.
 
 ## Licença
 
