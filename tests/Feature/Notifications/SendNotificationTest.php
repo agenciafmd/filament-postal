@@ -9,7 +9,7 @@ use Agenciafmd\Postal\Notifications\SendNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-uses(TestCase::class, RefreshDatabase::class);
+pest()->extend(TestCase::class)->use(RefreshDatabase::class);
 
 it('builds the mail with the default greeting, subject and copies', function (): void {
     config()->set('app.name', 'FMD');

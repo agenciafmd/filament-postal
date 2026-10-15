@@ -9,7 +9,7 @@ use Agenciafmd\Postal\Services\PostalService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-uses(TestCase::class, RefreshDatabase::class);
+pest()->extend(TestCase::class)->use(RefreshDatabase::class);
 
 it('lists every recipient once and in alphabetical order', function (): void {
     Postal::factory()->create(['to' => 'b@example.com', 'cc' => ['a@example.com'], 'bcc' => []]);
