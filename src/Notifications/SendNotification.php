@@ -59,7 +59,7 @@ final class SendNotification extends Notification implements ShouldQueue
             ],
         ], $this->data);
 
-        $mail = (new MailMessage)
+        $mail = new MailMessage()
             ->markdown('filament-postal::markdown.email')
             ->theme('filament-postal::theme.tabler')
             ->level('default')
@@ -82,7 +82,7 @@ final class SendNotification extends Notification implements ShouldQueue
         }
 
         if ($this->from) {
-            $mail->replyTo(key($this->from), current($this->from));
+            $mail->replyTo(array_key_first($this->from), array_first($this->from));
         }
 
         collect($notifiable->cc ?? [])

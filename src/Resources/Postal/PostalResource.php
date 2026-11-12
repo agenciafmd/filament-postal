@@ -17,16 +17,21 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Override;
 use Tapp\FilamentAuditing\RelationManagers\AuditsRelationManager;
 
 final class PostalResource extends Resource
 {
+    #[Override]
     protected static ?string $slug = 'postal';
 
+    #[Override]
     protected static ?string $model = Postal::class;
 
+    #[Override]
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedEnvelope;
 
+    #[Override]
     protected static ?string $recordTitleAttribute = 'name';
 
     public static function getModelLabel(): string

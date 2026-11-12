@@ -6,12 +6,14 @@ namespace Agenciafmd\Postal\Database\Factories;
 
 use Agenciafmd\Postal\Models\Postal;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Override;
 
 /**
  * @extends Factory<Postal>
  */
 final class PostalFactory extends Factory
 {
+    #[Override]
     protected $model = Postal::class;
 
     public function definition(): array
